@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="jogo-container">
+
+    <h1>🎮 Desafio da Doceria</h1>
+
+    <p class="subtitulo">
+        Teste seus conhecimentos e conquiste doces grátis!
+    </p>
+
+
+    <!-- ==================================
+         PLACAR
+    =================================== -->
+
+    <div class="placar-jogo">
+
+        <div>
+            ⭐
+            <strong>
+                {{ usuario.pontos }}
+            </strong>
+            <span>Pontos</span>
+        </div>
+
+        <div>
+            🔥
+            <strong>
+                {{ sequencia }}
+            </strong>
+            <span>Sequência</span>
+        </div>
+
+        <div>
+            🎯
+            <strong>
+                {{ progresso }}/{{ total_perguntas }}
+            </strong>
+            <span>Rodada</span>
+        </div>
+
+    </div>
+
+
+    <!-- ==================================
+         RECOMPENSA
+    =================================== -->
+
+    {% if usuario.recompensa_disponivel %}
+
+    <div class="recompensa-jogo">
+
+        🎁 <strong>VOCÊ DESBLOQUEOU UM DOCE GRÁTIS!</strong>
+
+        <p>
+            Você atingiu 50 pontos.
+        </p>
+
+        <a
+            href="{{ url_for('resgatar_recompensa') }}"
+            class="btn"
+        >
+            🍬 Resgatar recompensa
+        </a>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ==================================
+         MENSAGEM
+    =================================== -->
+
+    {% if mensagem %}
+
+    <div
+        class="
+            mensagem-jogo
+            {% if tipo_mensagem == 'erro' %}
+                mensagem-erro
+            {% else %}
+                mensagem-acerto
+            {% endif %}
+        "
+    >
+
+        {{ mensagem }}
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ==================================
+         PERGUNTA
+    =================================== -->
+
+    <div class="jogo-card">
+
+        <div class="pergunta-numero">
+
+            Pergunta {{ progresso }}
+
+            de
+
+            {{ total_perguntas }}
+
+        </div>
+
+
+        <h2>
+            {{ pergunta.pergunta }}
+        </h2>
+
+
+        <form method="POST">
+
+            <div class="opcoes-jogo">
+
+                {% for opcao in pergunta.opcoes %}
+
+                <button
+                    type="submit"
+                    name="resposta"
+                    value="{{ loop.index0 }}"
+                    class="opcao-jogo"
+                >
+
+                    <span class="numero-opcao">
+                        {{ loop.index }}
+                    </span>
+
+                    {{ opcao }}
+
+                </button>
+
+                {% endfor %}
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- ==================================
+         BARRA DE PROGRESSO
+    =================================== -->
+
+    <div class="progresso-container">
+
+        <div class="progresso-texto">
+
+            <span>
+                Progresso da rodada
+            </span>
+
+            <strong>
+                {{ progresso }}/{{ total_perguntas }}
+            </strong>
+
+        </div>
+
+
+        <div class="barra">
+
+            <div
+                class="barra-preenchida"
+                style="width: {{ (progresso / total_perguntas * 100)|round }}%;"
+            ></div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ==================================
+         INFORMAÇÕES
+    =================================== -->
+
+    <div class="regras-jogo">
+
+        <h3>
+            🏆 Como funciona?
+        </h3>
+
+        <p>
+            ✅ Acertou = +10 pontos
+        </p>
+
+        <p>
+            🔥 3 acertos seguidos = +5 pontos bônus
+        </p>
+
+        <p>
+            🎁 50 pontos = doce grátis
+        </p>
+
+        <p>
+            🚫 As perguntas não se repetem na mesma rodada
+        </p>
+
+    </div>
+
+</div>
+
+{% endblock %}

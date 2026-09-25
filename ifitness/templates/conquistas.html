@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="container">
+
+    <div class="text-center">
+        <h1>🏆 Minhas Conquistas</h1>
+
+        <p>
+            Compre seus favoritos e conquiste novos níveis
+            na Delícias Araújo! 
+        </p>
+    </div>
+
+    <hr>
+
+    {% if conquistas %}
+
+        <div class="conquistas-grid">
+
+            {% for item in conquistas %}
+
+                <div class="pedido">
+
+                    <div style="text-align: center;">
+
+                        <div style="font-size: 60px;">
+                            {{ item.emoji }}
+                        </div>
+
+                        <h2>
+                            {{ item.categoria }}
+                        </h2>
+
+                        <span class="status status-pronto">
+                            {{ item.nivel }}
+                        </span>
+
+                    </div>
+
+                    <br>
+
+                    <p style="text-align: center;">
+                        Você já comprou
+                        <strong>{{ item.total }}</strong>
+                        produtos dessa categoria.
+                    </p>
+
+                    <!-- Barra de progresso -->
+                    <div
+                        style="
+                            width: 100%;
+                            height: 20px;
+                            background: #eee;
+                            border-radius: 10px;
+                            overflow: hidden;
+                        "
+                    >
+
+                        <div
+                            style="
+                                width: {{ item.progresso }}%;
+                                height: 100%;
+                                background: #28a745;
+                                transition: width 0.5s;
+                            "
+                        ></div>
+
+                    </div>
+
+                    <p style="text-align: center;">
+                        {{ item.progresso }}% para o próximo nível
+                    </p>
+
+                    {% if item.proximo %}
+
+                        <p style="text-align: center;">
+
+                            🎯 Faltam
+                            <strong>{{ item.restantes }}</strong>
+                            produtos para conquistar o nível
+                            <strong>{{ item.proximo }}</strong>!
+
+                        </p>
+
+                    {% else %}
+
+                        <p
+                            style="
+                                text-align: center;
+                                font-weight: bold;
+                            "
+                        >
+                            🎉 Parabéns!
+
+                            Você alcançou o nível máximo
+                            nessa categoria!
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="vazio">
+
+            <h2>🏆 Nenhuma conquista ainda</h2>
+
+            <p>
+                Faça seu primeiro pedido na Delícias Araújo
+                para começar a conquistar níveis!
+            </p>
+
+            <a
+                href="{{ url_for('produtos') }}"
+                class="btn"
+            >
+                🍰 Ver Cardápio
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

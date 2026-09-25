@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="form-container">
+
+    <h1>🔐 Área dos Funcionários</h1>
+
+    <p class="subtitulo">
+        Acesso exclusivo para a equipe
+        da Delícias Araújo.
+    </p>
+
+
+    {% if resultado == "falha" %}
+
+        <div class="erro">
+
+            E-mail ou senha inválidos,
+            ou esta conta não possui
+            permissão de funcionário.
+
+        </div>
+
+    {% endif %}
+
+
+    <form
+        method="POST"
+        action="{{ url_for('funcionario_autenticar') }}"
+    >
+
+        <div class="form-group">
+
+            <label>
+                E-mail profissional
+            </label>
+
+            <input
+                type="email"
+                name="email"
+                placeholder="funcionario@empresa.com"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>
+                Senha
+            </label>
+
+            <input
+                type="password"
+                name="senha"
+                placeholder="Digite sua senha"
+                required
+            >
+
+        </div>
+
+
+        <button type="submit">
+
+            Entrar como funcionário
+
+        </button>
+
+    </form>
+
+
+    <p class="texto-centro">
+
+        <a href="{{ url_for('login') }}">
+
+            ← Voltar para login do cliente
+
+        </a>
+
+    </p>
+
+</div>
+
+{% endblock %}

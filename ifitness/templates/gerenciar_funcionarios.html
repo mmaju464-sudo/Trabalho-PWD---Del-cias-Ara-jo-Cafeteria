@@ -1,0 +1,280 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="form-container">
+
+    <h1>👥 Gerenciar Funcionários</h1>
+
+    {% if mensagem %}
+        <div class="erro">
+            {{ mensagem }}
+        </div>
+    {% endif %}
+
+    <div class="finalizar-container">
+
+        <h2>➕ Cadastrar Funcionário</h2>
+
+        <form method="POST">
+
+            <div class="form-group">
+                <label>Nome</label>
+
+                <input
+                    type="text"
+                    name="nome"
+                    placeholder="Nome completo do funcionário"
+                    required
+                >
+            </div>
+
+            <div class="form-group">
+                <label>E-mail profissional</label>
+
+                <input
+                    type="email"
+                    name="email"
+                    placeholder="funcionarioCafeteria@gmail.com"
+                    required
+                >
+            </div>
+            <div></div>
+
+            <div class="form-group">
+                <label>Senha</label>
+
+                <input
+                    type="password"
+                    name="senha"
+                    placeholder="Crie uma senha"
+                    required
+                >
+            </div>
+            <div class="form-group">
+    <label>Data de registro</label>
+
+    <input
+        type="text"
+        value="{{ data_atual }}"
+        readonly
+    >
+</div>
+
+            <button type="submit">
+                👤 Cadastrar Funcionário
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<hr>
+
+<h2>🟢 Funcionários Ativos</h2>
+
+{% for funcionario in funcionarios_ativos %}
+
+<div class="pedido">
+
+    <div class="pedido-topo">
+
+        <h3>
+            👤 {{ funcionario.nome }}
+        </h3>
+
+        <span class="status status-pronto">
+            ATIVO
+        </span>
+
+    </div>
+
+    <p>
+        <strong>E-mail:</strong>
+        {{ funcionario.email }}
+    </p>
+
+    <p>
+        <strong>Permissão:</strong>
+        {{ funcionario.tipo }}
+    </p>
+
+    <p>
+        <strong>Data de entrada:</strong>
+        {{ funcionario.data_entrada or "Não informada" }}
+    </p>
+
+    <details>
+        <summary>🔴 Desligar funcionário</summary>
+
+        <br>
+
+        <form
+            method="POST"
+            action="{{ url_for('desligar_funcionario', id=funcionario.id) }}"
+        >
+
+            <div class="form-group">
+
+                <label>Data de saída</label>
+
+                <input
+                    type="date"
+                    name="data_saida"
+                    required
+                >
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Motivo da saída</label>
+
+                <select name="motivo_saida" required>
+
+                    <option value="">
+                        Selecione
+                    </option>
+
+                    <option value="demitido">
+                        Foi demitido
+                    </option>
+
+                    <option value="pediu_demissao">
+                        Pediu demissão
+                    </option>
+
+                </select>
+
+            </div>
+
+            <div class="form-group">
+
+                <label>Observação</label>
+
+                <textarea
+                    name="observacao_saida"
+                    rows="3"
+                    placeholder="Digite uma observação..."
+                ></textarea>
+
+            </div>
+
+            <button
+                type="submit"
+                onclick="return confirm('Tem certeza que deseja desligar este funcionário?')"
+            >
+                🔴 Confirmar desligamento
+            </button>
+
+        </form>
+
+    </details>
+
+</div>
+
+{% else %}
+
+<div class="vazio">
+
+    <h2>Nenhum funcionário ativo.</h2>
+
+    <p>
+        Cadastre um funcionário usando o formulário acima.
+    </p>
+
+</div>
+
+{% endfor %}
+
+
+<hr>
+
+
+<h2>📁 Histórico de Funcionários</h2>
+
+<p>
+    Aqui ficam registrados os funcionários que já deixaram a empresa.
+</p>
+
+
+{% for funcionario in funcionarios_desligados %}
+
+<div class="pedido">
+
+    <div class="pedido-topo">
+
+        <h3>
+            👤 {{ funcionario.nome }}
+        </h3>
+
+        <span class="status">
+            🔴 DESLIGADO
+        </span>
+
+    </div>
+
+    <p>
+        <strong>E-mail:</strong>
+        {{ funcionario.email }}
+    </p>
+
+    <p>
+        <strong>Data de entrada:</strong>
+        {{ funcionario.data_entrada or "Não informada" }}
+    </p>
+
+    <p>
+        <strong>Data de saída:</strong>
+        {{ funcionario.data_saida or "Não informada" }}
+    </p>
+
+    <p>
+        <strong>Motivo:</strong>
+
+        {% if funcionario.motivo_saida == "demitido" %}
+
+            Foi demitido
+
+        {% elif funcionario.motivo_saida == "pediu_demissao" %}
+
+            Pediu demissão
+
+        {% else %}
+
+            Não informado
+
+        {% endif %}
+
+    </p>
+
+    {% if funcionario.observacao_saida %}
+
+    <p>
+        <strong>📝 Observação:</strong>
+        {{ funcionario.observacao_saida }}
+    </p>
+
+    {% endif %}
+
+</div>
+
+{% else %}
+
+<div class="vazio">
+
+    <h2>Nenhum funcionário desligado.</h2>
+
+    <p>
+        Quando um funcionário sair da empresa,
+        o registro aparecerá aqui.
+    </p>
+
+</div>
+
+{% endfor %}
+
+{% endblock %}

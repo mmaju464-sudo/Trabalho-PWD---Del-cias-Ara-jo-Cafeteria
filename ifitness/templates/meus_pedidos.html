@@ -1,0 +1,161 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<h1>Meus Pedidos</h1>
+
+{% if pedidos %}
+
+    {% for p in pedidos %}
+
+    <div class="pedido">
+
+        <div class="pedido-topo">
+
+            <h3>
+                Pedido {{ p.id }}
+            </h3>
+
+            <span class="status status-{{ p.status }}">
+                {{ p.status|capitalize }}
+            </span>
+
+        </div>
+
+
+        <p>
+            <strong>Data:</strong>
+            {{ p.data }}
+        </p>
+
+        <p>
+            <strong>Horário:</strong>
+            {{ p.hora }}
+        </p>
+
+        <p>
+            <strong>Tipo:</strong>
+            {{ p.tipo|capitalize }}
+        </p>
+
+        <p>
+            <strong>Pessoas:</strong>
+            {{ p.pessoas }}
+        </p>
+
+        <p>
+            <strong>Local:</strong>
+            {{ p.local }}
+        </p>
+
+
+        {% if p.descricao %}
+
+        <p>
+            <strong>Observação:</strong>
+            {{ p.descricao }}
+        </p>
+
+        {% endif %}
+
+
+        <p>
+            <strong>Prioridade:</strong>
+
+            {% if p.prioridade == "BAIXA" %}
+
+                <span class="prioridade">
+                    Baixa
+                </span>
+
+            {% elif p.prioridade == "NORMAL" %}
+
+                <span class="prioridade">
+                    Normal
+                </span>
+            {% else %}
+
+                <span class="prioridade">
+                    Alta
+                </span>
+
+            {% endif %}
+
+        </p>
+
+
+        <p>
+            <strong>Total:</strong>
+            R$ {{ "%.2f"|format(p.total) }}
+        </p>
+
+
+        <h4>Itens do pedido:</h4>
+
+
+        <ul class="lista-itens">
+
+            {% for item in p.itens %}
+
+            <li>
+
+                {{ item.nome }}
+                — {{ item.quantidade }}x
+
+                {% if item.get("sabor") %}
+
+                    <br>
+
+                    <small>
+                         Sabor: {{ item.sabor }}
+                    </small>
+
+                {% endif %}
+
+            </li>
+
+            {% endfor %}
+
+        </ul>
+
+
+        <!-- BOTÃO CANCELAR -->
+
+        {% if p.status == "pendente" %}
+
+        <a
+            href="{{ url_for('cancelar', id=p.id) }}"
+            class="btn btn-remover"
+            onclick="return confirm('Tem certeza que deseja cancelar este pedido?');"
+        >
+            Cancelar Pedido
+        </a>
+
+        {% endif %}
+
+
+    </div>
+
+    {% endfor %}
+
+
+{% else %}
+
+<div class="vazio">
+
+    <h2>
+        Você ainda não possui pedidos.
+    </h2>
+
+    <a
+        href="{{ url_for('produtos') }}"
+        class="btn"
+    >
+        Fazer um pedido
+    </a>
+
+</div>
+
+{% endif %}
+
+{% endblock %}

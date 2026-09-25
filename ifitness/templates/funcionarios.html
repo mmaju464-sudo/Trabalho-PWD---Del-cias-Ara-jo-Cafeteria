@@ -1,0 +1,669 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<h1>
+    👩‍🍳 Painel dos Funcionários
+</h1>
+
+<p>
+    Registre pedidos feitos na loja
+    e acompanhe os pedidos online.
+</p>
+
+
+<!-- ================================= -->
+<!-- RESUMO -->
+<!-- ================================= -->
+
+<div class="dashboard">
+
+    <div class="dashboard-card">
+
+        <h3>
+            📦 Total de Pedidos
+        </h3>
+
+        <div class="numero">
+            {{ pedidos|length }}
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <h3>
+             Pendentes
+        </h3>
+
+        <div class="numero">
+
+            {{
+                pedidos
+                |selectattr(
+                    'status',
+                    'equalto',
+                    'pendente'
+                )
+                |list
+                |length
+            }}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- REGISTRAR PEDIDO DA LOJA -->
+<!-- ================================= -->
+
+<div class="finalizar-container">
+
+    <h2>
+        🧾 Registrar pedido feito na loja
+    </h2>
+
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'funcionario_novo_pedido'
+        ) }}"
+    >
+
+
+        <!-- CLIENTE -->
+
+        <div class="form-group">
+
+            <label>
+                Cliente
+            </label>
+
+            <select
+                name="cliente_id"
+                required
+            >
+
+                <option value="">
+                    Selecione o cliente
+                </option>
+
+
+                {% for cliente in clientes %}
+
+                    <option
+                        value="{{ cliente.id }}"
+                    >
+
+                        {{ cliente.nome }}
+                        —
+                        {{ cliente.email }}
+
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- PRODUTOS -->
+
+        <div id="produtos-pedido">
+
+
+            <div
+                class="linha-produto"
+                style="
+                    display:grid;
+                    grid-template-columns:
+                    2fr 1fr 1fr auto;
+                    gap:10px;
+                    margin-bottom:10px;
+                "
+            >
+
+
+                <select
+                    name="produto_id"
+                    required
+                >
+
+                    <option value="">
+                        Produto
+                    </option>
+
+
+                    {% for produto in produtos %}
+
+                        <option
+                            value="{{ produto.id }}"
+                        >
+
+                            {{ produto.nome }}
+
+                            —
+
+                            R$
+                            {{ "%.2f"|format(
+                                produto.preco
+                            ) }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+
+                <input
+                    type="number"
+                    name="quantidade"
+                    min="1"
+                    value="1"
+                    required
+                >
+
+
+                <input
+                    type="text"
+                    name="sabor"
+                    placeholder="Sabor"
+                >
+
+
+                <button
+                    type="button"
+                    onclick="
+                        this.parentElement.remove()
+                    "
+                >
+
+                    Remover
+
+                </button>
+
+
+            </div>
+
+
+        </div>
+
+
+        <button
+            type="button"
+            onclick="adicionarProduto()"
+        >
+
+            ➕ Adicionar produto
+
+        </button>
+
+
+        <!-- TIPO -->
+
+        <div class="form-group">
+
+            <label>
+                Tipo do pedido
+            </label>
+
+            <select
+                name="tipo"
+                required
+            >
+
+                <option value="retirada">
+                    Retirada
+                </option>
+
+                <option value="entrega">
+                    🚚 Entrega
+                </option>
+
+                <option value="evento">
+                    Evento
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- DATA -->
+
+        <div class="form-group">
+
+            <label>
+                Data
+            </label>
+
+            <input
+                type="date"
+                name="data"
+                required
+            >
+
+        </div>
+
+
+        <!-- HORA -->
+
+        <div class="form-group">
+
+            <label>
+                Horário
+            </label>
+
+            <input
+                type="time"
+                name="hora"
+                required
+            >
+
+        </div>
+
+
+        <!-- PESSOAS -->
+
+        <div class="form-group">
+
+            <label>
+                Pessoas
+            </label>
+
+            <input
+                type="number"
+                name="pessoas"
+                min="1"
+                value="1"
+                required
+            >
+
+        </div>
+
+
+        <!-- LOCAL -->
+
+        <div class="form-group">
+
+            <label>
+                Endereço / Local
+            </label>
+
+            <input
+                type="text"
+                name="local"
+                placeholder="
+                    Endereço da entrega
+                    ou local de retirada
+                "
+                required
+            >
+
+        </div>
+
+
+        <!-- OBSERVAÇÃO -->
+
+        <div class="form-group">
+
+            <label>
+                Observação
+            </label>
+
+            <textarea
+                name="descricao"
+                placeholder="
+                    Alguma observação sobre o pedido
+                "
+            ></textarea>
+
+        </div>
+
+
+        <button type="submit">
+
+             Registrar pedido
+
+        </button>
+
+
+    </form>
+
+</div>
+
+
+<!-- ================================= -->
+<!-- PEDIDOS -->
+<!-- ================================= -->
+
+<h2>
+     Pedidos
+</h2>
+
+
+{% for p in pedidos %}
+
+<div class="pedido">
+
+
+    <div class="pedido-topo">
+
+        <h3>
+            Pedido #{{ p.id }}
+        </h3>
+
+
+        <span
+            class="
+                status
+                status-{{ p.status
+                    |replace(' ', '-') }}
+            "
+        >
+
+            {{ p.status|capitalize }}
+
+        </span>
+
+    </div>
+
+
+    <p>
+
+        <strong>
+            Cliente:
+        </strong>
+
+        {{ p.usuario.nome }}
+
+        —
+
+        {{ p.usuario.email }}
+
+    </p>
+
+
+    <p>
+
+        <strong>
+            Origem:
+        </strong>
+
+        {% if p.origem == "loja" %}
+
+            🏪 Pedido registrado na loja
+
+        {% else %}
+
+             Pedido feito online
+
+        {% endif %}
+
+    </p>
+
+
+    <p>
+
+        <strong>
+            Tipo:
+        </strong>
+
+        {{ p.tipo|capitalize }}
+
+    </p>
+
+
+    <p>
+
+        <strong>
+            Data:
+        </strong>
+
+        {{ p.data }}
+
+        às
+
+        {{ p.hora }}
+
+    </p>
+
+
+    <p>
+
+        <strong>
+            Local:
+        </strong>
+
+        {{ p.local }}
+
+    </p>
+
+
+    <p>
+
+        <strong>
+            Prioridade:
+        </strong>
+
+        {{ p.prioridade|capitalize }}
+
+    </p>
+
+
+    <p>
+
+        <strong>
+            Total:
+        </strong>
+
+        R$
+        {{ "%.2f"|format(p.total) }}
+
+    </p>
+
+
+    {% if p.entregador %}
+
+        <p>
+
+            <strong>
+                 Entregador:
+            </strong>
+
+            {{ p.entregador }}
+
+        </p>
+
+    {% endif %}
+
+
+    <!-- ALTERAR STATUS -->
+
+    <form
+        method="POST"
+        action="{{ url_for(
+            'funcionario_atualizar_status',
+            id=p.id
+        ) }}"
+    >
+
+
+        <div class="form-group">
+
+            <label>
+                Status
+            </label>
+
+
+            <select name="status">
+
+                <option
+                    value="pendente"
+                    {% if p.status == "pendente" %}
+                        selected
+                    {% endif %}
+                >
+                    Pendente
+                </option>
+
+
+                <option
+                    value="em preparo"
+                    {% if p.status == "em preparo" %}
+                        selected
+                    {% endif %}
+                >
+                    Em preparo
+                </option>
+
+
+                <option
+                    value="pronto"
+                    {% if p.status == "pronto" %}
+                        selected
+                    {% endif %}
+                >
+                    Pronto
+                </option>
+
+
+                <option
+                    value="saiu para entrega"
+                    {% if p.status == "saiu para entrega" %}
+                        selected
+                    {% endif %}
+                >
+                    Saiu para entrega
+                </option>
+
+
+                <option
+                    value="entregue"
+                    {% if p.status == "entregue" %}
+                        selected
+                    {% endif %}
+                >
+                    Entregue
+                </option>
+
+
+                <option
+                    value="cancelado"
+                    {% if p.status == "cancelado" %}
+                        selected
+                    {% endif %}
+                >
+                    Cancelado
+                </option>
+
+            </select>
+
+        </div>
+
+
+        {% if p.tipo == "entrega" %}
+
+        <div class="form-group">
+
+            <label>
+                 Nome do entregador
+            </label>
+
+            <input
+                type="text"
+                name="entregador"
+                value="{{ p.entregador or '' }}"
+                placeholder="Ex: João"
+            >
+
+        </div>
+
+        {% endif %}
+
+
+        <button type="submit">
+
+            🔄 Atualizar pedido
+
+        </button>
+
+
+    </form>
+
+
+</div>
+
+
+{% else %}
+
+<div class="vazio">
+
+    <h2>
+        Nenhum pedido registrado.
+    </h2>
+
+</div>
+
+{% endfor %}
+
+
+<script>
+
+function adicionarProduto() {
+
+    const area =
+        document.getElementById(
+            "produtos-pedido"
+        );
+
+
+    const linhas =
+        area.querySelectorAll(
+            ".linha-produto"
+        );
+
+
+    if (linhas.length === 0) {
+
+        location.reload();
+
+        return;
+
+    }
+
+
+    const linha =
+        linhas[0].cloneNode(true);
+
+
+    linha.querySelector(
+        "select[name='produto_id']"
+    ).value = "";
+
+
+    linha.querySelector(
+        "input[name='quantidade']"
+    ).value = 1;
+
+
+    linha.querySelector(
+        "input[name='sabor']"
+    ).value = "";
+
+
+    area.appendChild(linha);
+
+}
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,112 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<div class="form-container">
+
+    <h1>Bem-vindo!</h1>
+
+    <p class="subtitulo">
+        Entre para fazer seus pedidos.
+    </p>
+
+
+    {% if resultado == "falha" %}
+
+        <div class="erro">
+            E-mail ou senha inválidos.
+        </div>
+
+    {% endif %}
+
+
+    {% if resultado == "funcionario_login" %}
+
+        <div class="erro">
+
+            Esta conta pertence à equipe.
+            <br>
+
+            Entre pela área de funcionários.
+
+        </div>
+
+    {% endif %}
+
+
+    {% if resultado == "cadastrado" %}
+
+        <div class="sucesso">
+
+            Cadastro realizado com sucesso!
+            Agora você pode entrar.
+
+        </div>
+
+    {% endif %}
+
+
+    <form
+        method="POST"
+        action="{{ url_for('autenticar') }}"
+    >
+
+        <div class="form-group">
+
+            <label>E-mail</label>
+
+            <input
+                type="email"
+                name="email"
+                placeholder="Digite seu e-mail"
+                required
+            >
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label>Senha</label>
+
+            <input
+                type="password"
+                name="senha"
+                placeholder="Digite sua senha"
+                required
+            >
+
+        </div>
+
+
+        <button type="submit">
+            Entrar
+        </button>
+
+    </form>
+
+
+    <p class="texto-centro">
+
+        Ainda não possui uma conta?
+
+        <a href="{{ url_for('cadastro') }}">
+            Cadastre-se
+        </a>
+
+    </p>
+
+
+    <p class="texto-centro">
+
+        <a href="{{ url_for('funcionario_login') }}">
+
+            🔐 Acesso de funcionários
+
+        </a>
+
+    </p>
+
+</div>
+
+{% endblock %}

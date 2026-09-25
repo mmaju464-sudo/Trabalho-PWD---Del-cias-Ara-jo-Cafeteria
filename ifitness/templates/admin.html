@@ -1,0 +1,326 @@
+{% extends 'base.html' %}
+
+{% block conteudo %}
+
+<h1>Painel Administrativo</h1>
+
+
+<!-- ============================= -->
+<!-- CARDS DO DASHBOARD -->
+<!-- ============================= -->
+
+<div class="dashboard">
+
+    <div class="dashboard-card">
+
+        <h3>Total de Pedidos</h3>
+
+        <div class="numero">
+            {{ total_pedidos }}
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <h3>Pedidos Pendentes</h3>
+
+        <div class="numero">
+            {{ pedidos_pendentes }}
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card">
+
+        <h3>Faturamento</h3>
+
+        <div class="numero">
+            R$ {{ "%.2f"|format(faturamento) }}
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- GRÁFICO DE MAIS VENDIDOS -->
+<!-- ============================= -->
+
+<div class="grafico-card">
+
+    <h2>🍰 Produtos mais vendidos</h2>
+
+    <p>
+        Confira quais produtos tiveram mais vendas.
+    </p>
+
+    <canvas id="graficoMaisVendidos"></canvas>
+
+</div>
+
+
+<!-- ============================= -->
+<!-- TODOS OS PEDIDOS -->
+<!-- ============================= -->
+
+<h2>Todos os Pedidos</h2>
+
+
+{% if pedidos %}
+
+    {% for p in pedidos %}
+
+    <div class="pedido">
+
+        <div class="pedido-topo">
+
+            <h3>
+                Pedido #{{ p.id }}
+            </h3>
+
+            <span class="status status-{{ p.status }}">
+                {{ p.status|capitalize }}
+            </span>
+
+        </div>
+
+
+        <p>
+            <strong>Cliente:</strong>
+            {{ p.usuario }}
+        </p>
+
+
+        <p>
+            <strong>Data:</strong>
+            {{ p.data }}
+        </p>
+
+
+        <p>
+            <strong>Horário:</strong>
+            {{ p.hora }}
+        </p>
+
+
+        <p>
+            <strong>Tipo:</strong>
+            {{ p.tipo }}
+        </p>
+
+
+        <p>
+            <strong>Pessoas:</strong>
+            {{ p.pessoas }}
+        </p>
+
+
+        <p>
+            <strong>Local:</strong>
+            {{ p.local }}
+        </p>
+
+
+        <p>
+            <strong>Prioridade:</strong>
+            {{ p.prioridade|capitalize }}
+        </p>
+
+
+        <p>
+            <strong>Total:</strong>
+            R$ {{ "%.2f"|format(p.total) }}
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+{% else %}
+
+    <div class="vazio">
+
+        <h2>Ainda não existem pedidos.</h2>
+
+    </div>
+
+{% endif %}
+
+
+<!-- ============================= -->
+<!-- CHART.JS -->
+<!-- ============================= -->
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+<script>
+
+    const nomes = {{ nomes | tojson | safe }};
+
+    const quantidades = {{ quantidades | tojson | safe }};
+
+
+    const canvas = document.getElementById(
+        "graficoMaisVendidos"
+    );
+
+
+    if (canvas && nomes.length > 0) {
+
+        new Chart(canvas, {
+
+            type: "bar",
+
+            data: {
+
+                labels: nomes,
+
+                datasets: [
+
+                    {
+
+                        label: "Unidades vendidas",
+
+                        data: quantidades,
+
+                        backgroundColor: [
+                            "#7b2942",
+                            "#b94c70",
+                            "#d67d98",
+                            "#e7a7b8",
+                            "#f1c4d0",
+                            "#7b2942",
+                            "#b94c70",
+                            "#d67d98",
+                            "#e7a7b8",
+                            "#f1c4d0"
+                        ],
+
+                        borderRadius: 8
+
+                    }
+
+                ]
+
+            },
+
+
+            options: {
+
+                responsive: true,
+
+                maintainAspectRatio: true,
+
+                plugins: {
+
+                    legend: {
+
+                        display: false
+
+                    }
+
+                },
+
+
+                scales: {
+
+                    y: {
+
+                        beginAtZero: true,
+
+                        ticks: {
+
+                            precision: 0
+
+                        },
+
+                        title: {
+
+                            display: true,
+
+                            text: "Quantidade vendida"
+
+                        }
+
+                    },
+
+
+                    x: {
+
+                        title: {
+
+                            display: true,
+
+                            text: "Produtos"
+
+                        }
+
+                    }
+
+                }
+
+            }
+
+        });
+
+    }
+
+</script>
+
+
+<!-- ============================= -->
+<!-- ESTILO DO GRÁFICO -->
+<!-- ============================= -->
+
+<style>
+
+    .grafico-card {
+
+        background: white;
+
+        padding: 25px;
+
+        margin: 30px auto;
+
+        border-radius: 15px;
+
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
+
+        max-width: 900px;
+
+    }
+
+
+    .grafico-card h2 {
+
+        margin-bottom: 5px;
+
+    }
+
+
+    .grafico-card p {
+
+        margin-bottom: 20px;
+
+        color: #666;
+
+    }
+
+
+    #graficoMaisVendidos {
+
+        width: 100% !important;
+
+        max-height: 450px;
+
+    }
+
+</style>
+
+
+{% endblock %}
